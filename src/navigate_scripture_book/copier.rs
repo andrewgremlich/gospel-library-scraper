@@ -20,17 +20,12 @@ fn parse_first_chapters(section_of_book: &Html, active_link: &Selector) {
   for element in section_of_book.select(&active_link) {
     let page_title = element.text().collect::<Vec<_>>()[0];
 
-    match element.value().attr("href") {
-      Some(url) => {
-        //get page code
-        let urls_of_first_chapter: UrlReference = urls_of_first_chapter(url);
-        println!("{:?}", urls_of_first_chapter);
-        // get_page().await;
-        order_number = order_number + 1;
-      }
-      _ => {
-        // println!("No URL!");
-      }
+    if let Some(url) = element.value().attr("href") {
+      //get page code
+      let urls_of_first_chapter: UrlReference = urls_of_first_chapter(url);
+      println!("{:?}", urls_of_first_chapter);
+      // get_page().await;
+      order_number = order_number + 1;
     }
   }
 }
