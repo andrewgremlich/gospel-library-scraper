@@ -1,25 +1,38 @@
+mod copier;
+
 use gospellibraryscraper::navigate;
 use scraper::{Html, Selector};
 
-pub async fn main(main_resp: &(Html, Selector)) {
-  let document: &Html = &main_resp.0;
-  let selector: &Selector = &main_resp.1;
+//async
+async fn navigate_manifest(resp: &Html) {
+  let contents_html: &Html = &resp;
+  let contents_selector: Selector = Selector::parse(".manifest a").unwrap();
+
+  let mut index_count: u8 = 1;
+
+  for link in contents_html.select(&contents_selector) {
+    match link.value().attr("href") {
+      Some(url) => {
+        copier::main(url, index_count).await;
+        index_count = index_count + 1;
+      }
+      _ => {
+        // println!("No URL!");
+      }
+    }
+  }
+}
+
+pub async fn main(main_resp: &Html) {
+  let document: &Html = &main_resp;
+  let selector: Selector = Selector::parse(".tile-3KqhL").unwrap();
 
   for element in document.select(&selector) {
     match element.value().attr("href") {
       Some(url) => {
-        println!("{:?}", url);
+        let contents_of_scripture_book_html_data: Html = navigate(url).await.unwrap();
 
-        let contents_of_scripture_book_html_data: (Html, Selector) =
-          navigate(url, "h1#title1").await.unwrap();
-
-        let contents_html: Html = contents_of_scripture_book_html_data.0;
-        let contents_selector: Selector = contents_of_scripture_book_html_data.1;
-
-        for title in contents_html.select(&contents_selector) {
-          let title: Vec<&str> = title.text().collect::<Vec<_>>();
-          println!("{:?}", title[0]);
-        }
+        navigate_manifest(&contents_of_scripture_book_html_data).await;
       }
       _ => {
         println!("Nothing to see here");

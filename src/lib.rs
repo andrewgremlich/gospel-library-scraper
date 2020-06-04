@@ -1,16 +1,17 @@
-use scraper::{Html, Selector};
+use scraper::Html;
 
 const CHURCH_ROOT: &str = "https://www.churchofjesuschrist.org";
 
-pub async fn navigate(
-  url: &str,
-  selector_str: &str,
-) -> Result<(Html, Selector), Box<dyn std::error::Error>> {
+pub fn no_query_params(url: &str) -> &str {
+  let string_collection: Vec<&str> = url.split("?").collect();
+  string_collection[0]
+}
+
+pub async fn navigate(url: &str) -> Result<Html, Box<dyn std::error::Error>> {
   let navigate_url: String = format!("{}{}", CHURCH_ROOT, url);
   let resp = reqwest::get(&navigate_url).await?.text().await?;
 
   let document = Html::parse_document(&resp);
-  let selector = Selector::parse(selector_str).unwrap();
 
-  return Ok((document, selector));
+  return Ok(document);
 }
