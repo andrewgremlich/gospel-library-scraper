@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::prelude::*;
 use scraper::Html;
 
 const CHURCH_ROOT: &str = "https://www.churchofjesuschrist.org";
@@ -14,4 +16,10 @@ pub async fn navigate(url: &str) -> Result<Html, Box<dyn std::error::Error>> {
   let document = Html::parse_document(&resp);
 
   return Ok(document);
+}
+
+pub fn write_file(file_name: &str, contents: &str) -> std::io::Result<()> {
+    let mut file = File::create(file_name)?;
+    file.write_all(contents.as_bytes())?;
+    Ok(())
 }

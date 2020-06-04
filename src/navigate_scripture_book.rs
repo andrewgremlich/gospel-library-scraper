@@ -3,7 +3,6 @@ mod copier;
 use gospellibraryscraper::navigate;
 use scraper::{Html, Selector};
 
-//async
 async fn navigate_manifest(resp: &Html) {
   let contents_html: &Html = &resp;
   let contents_selector: Selector = Selector::parse(".manifest a").unwrap();

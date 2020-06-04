@@ -1,4 +1,4 @@
-use gospellibraryscraper::navigate;
+use gospellibraryscraper::{navigate, write_file};
 use scraper::{Html, Selector};
 
 use gospellibraryscraper::no_query_params;
