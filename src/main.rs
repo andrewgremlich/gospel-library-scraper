@@ -1,6 +1,6 @@
 mod navigate_scripture_book;
 
-use gospellibraryscraper::navigate;
+use gospellibraryscraper::{navigate};
 use scraper::Html;
 
 #[tokio::main]

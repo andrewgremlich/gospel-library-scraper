@@ -1,1 +1,1 @@
-RUST_BACKTRACE=1 cargo run
+RUST_BACKTRACE=1 cargo run --verbose
