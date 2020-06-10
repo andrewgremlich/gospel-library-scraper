@@ -1,6 +1,6 @@
 mod copier;
 
-use gospellibraryscraper::navigate;
+use gospellibraryscraper::{navigate};
 use scraper::{Html, Selector};
 
 async fn navigate_manifest(resp: &Html) {
@@ -10,8 +10,10 @@ async fn navigate_manifest(resp: &Html) {
   let mut index_count: u8 = 1;
 
   for link in contents_html.select(&contents_selector) {
+    let title_text: &str = link.text().collect::<Vec<_>>()[0];
+
     if let Some(url) = link.value().attr("href") {
-      copier::main(url, index_count).await;
+      copier::copy(title_text, url).await;
       index_count = index_count + 1;
     }
   }

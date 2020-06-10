@@ -6,7 +6,10 @@ Also a duplicate of [Node Gospel Library Scraper](https://github.com/andrewgreml
 
 ## dev notes
 
-- Probably should remove all the unwraps and do proper error handling.
+- IMPORTANT! better DOM library for removeable. Use a wasm binary in order to remove? web_sys and wasm_bindgen
+  
+  - or use a combo of html5ever and CSS selectors
+
 - command line arguments? customability?
 
 ## reference
