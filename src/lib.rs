@@ -1,7 +1,8 @@
-use mkdirp::mkdirp;
-use scraper::Html;
 use std::fs::File;
 use std::io::prelude::*;
+
+use mkdirp::mkdirp;
+use scraper::Html;
 
 const CHURCH_ROOT: &str = "https://www.churchofjesuschrist.org";
 
@@ -35,8 +36,21 @@ pub fn write_index_file(file_name: &str, contents: &str) -> std::io::Result<Stri
   Ok(format!("{} index file has been written", file_name))
 }
 
-pub fn write_section(file_name: &str, contents: &str) -> std::io::Result<String> {
+pub fn write_section(
+  file_name: &str,
+  title: &str,
+  order_number: &u8,
+  contents: &str,
+  summary: &str,
+) -> std::io::Result<String> {
   let mut file = File::create(file_name)?;
+
+  file.write(b"---\n")?;
+  file.write(format!("title: {}\n", title).as_bytes())?;
+  file.write(format!("description: {}\n", summary).as_bytes())?;
+  file.write(format!("order: {}\n", order_number).as_bytes())?;
+  file.write(b"---\n")?;
   file.write_all(contents.as_bytes())?;
-  Ok(format!("{} section has been written", file_name))
+  
+  return Ok(format!("wrote {}", file_name));
 }

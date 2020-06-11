@@ -21,8 +21,9 @@ pub fn transform_source_scripture_text(chapter_text: Vec<&str>) -> String {
     } else {
       transformed_chapter_text.push_str(&format!("{}", text));
     }
-
   }
+
+  transformed_chapter_text.push_str("\n");
 
   return transformed_chapter_text;
 }

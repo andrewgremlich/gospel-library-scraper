@@ -1,6 +1,8 @@
 mod get_page;
 mod get_urls;
 
+use std::path::Path;
+
 use scraper::{Html, Selector};
 
 use get_page::{get_page, ScrapedPage};
@@ -27,22 +29,31 @@ async fn parse_first_chapters(title_text: &str, section_of_book: &Html, active_l
   for element in section_of_book.select(&active_link) {
     if let Some(url) = element.value().attr("href") {
       let urls_of_first_chapter: UrlReference = urls_of_first_chapter(url);
-      let page_data: ScrapedPage = get_page(&urls_of_first_chapter.original).await;
+      let path_exist: bool = Path::new(&urls_of_first_chapter.file).exists();
 
-      let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
-        order_number: 1,
-        title: String::from(title_text),
-        scraped_page: page_data,
-      };
+      if path_exist {
+        println!("exists {}", &urls_of_first_chapter.file);
+      } else {
+        let page_data: ScrapedPage = get_page(&urls_of_first_chapter.original).await;
 
-      write_dir(&urls_of_first_chapter.dir);
+        let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
+          order_number: 1,
+          title: String::from(title_text),
+          scraped_page: page_data,
+        };
 
-      if let Ok(d) = write_section(
-        &urls_of_first_chapter.file,
-        &ordered_scraped_page.scraped_page.contents,
-      ) {
-        println!("{:?}", d);
-      };
+        write_dir(&urls_of_first_chapter.dir);
+
+        if let Ok(d) = write_section(
+          &urls_of_first_chapter.file,
+          &ordered_scraped_page.title,
+          &ordered_scraped_page.order_number,
+          &ordered_scraped_page.scraped_page.contents,
+          &ordered_scraped_page.scraped_page.summary,
+        ) {
+          println!("{:?}", d);
+        };
+      }
     }
   }
 }
