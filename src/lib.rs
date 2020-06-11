@@ -35,22 +35,3 @@ pub fn write_index_file(file_name: &str, contents: &str) -> std::io::Result<Stri
   file.write_all(contents.as_bytes())?;
   Ok(format!("{} index file has been written", file_name))
 }
-
-pub fn write_section(
-  file_name: &str,
-  title: &str,
-  order_number: &u8,
-  contents: &str,
-  summary: &str,
-) -> std::io::Result<String> {
-  let mut file = File::create(file_name)?;
-
-  file.write(b"---\n")?;
-  file.write(format!("title: {}\n", title).as_bytes())?;
-  file.write(format!("description: {}\n", summary).as_bytes())?;
-  file.write(format!("order: {}\n", order_number).as_bytes())?;
-  file.write(b"---\n")?;
-  file.write_all(contents.as_bytes())?;
-  
-  return Ok(format!("wrote {}", file_name));
-}

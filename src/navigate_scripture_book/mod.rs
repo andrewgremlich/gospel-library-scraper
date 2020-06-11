@@ -10,10 +10,10 @@ async fn navigate_manifest(resp: &Html) {
   let mut index_count: u8 = 1;
 
   for link in contents_html.select(&contents_selector) {
-    let title_text: &str = link.text().collect::<Vec<_>>()[0];
+    let book_title: &str = link.text().collect::<Vec<_>>()[0];
 
     if let Some(url) = link.value().attr("href") {
-      copier::copy(title_text, url).await;
+      copier::copy(book_title, url).await;
       index_count = index_count + 1;
     }
   }

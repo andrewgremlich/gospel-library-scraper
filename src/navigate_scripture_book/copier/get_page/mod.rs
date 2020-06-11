@@ -1,5 +1,8 @@
 mod text_transform;
 
+use std::fs::File;
+use std::io::prelude::*;
+
 use scraper::{Html, Selector};
 use gospellibraryscraper::{navigate};
 use text_transform::transform_source_scripture_text;
@@ -10,8 +13,33 @@ pub struct ScrapedPage {
   pub summary: String,
 }
 
-pub async fn get_page(urls_of_first_chapter: &str) -> ScrapedPage {
-  let section_of_book: Html = navigate(urls_of_first_chapter).await.unwrap();
+#[derive(Debug)]
+pub struct OrderedScrapedPage {
+  pub order_number: u16,
+  pub title: String,
+  pub scraped_page: ScrapedPage,
+}
+
+impl OrderedScrapedPage {
+  pub fn write_section(
+    &self,
+    file_name: &str,
+  ) -> std::io::Result<String> {
+    let mut file = File::create(file_name)?;
+  
+    file.write(b"---\n")?;
+    file.write(format!("title: {}\n", &self.title).as_bytes())?;
+    file.write(format!("description: {}\n", &self.scraped_page.summary).as_bytes())?;
+    file.write(format!("order: {}\n", &self.order_number).as_bytes())?;
+    file.write(b"---\n")?;
+    file.write_all(&self.scraped_page.contents.as_bytes())?;
+    
+    return Ok(format!("wrote {}", file_name));
+  }
+}
+
+pub async fn get_page(original_url: &str) -> ScrapedPage {
+  let section_of_book: Html = navigate(original_url).await.unwrap();
 
   let chapter_text_selector = Selector::parse(".renderFrame-1yHgQ .body-block").unwrap();
   let chapter_summary_selector = Selector::parse("#study_summary1").unwrap();

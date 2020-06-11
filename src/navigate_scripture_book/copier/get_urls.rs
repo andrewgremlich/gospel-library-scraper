@@ -1,6 +1,6 @@
 use gospellibraryscraper::UrlReference;
 
-pub fn urls_of_first_chapter(url: &str) -> UrlReference {
+pub fn urls_of_chapter(url: &str) -> UrlReference {
   let no_query_param: Vec<&str> = url.split("?").collect();
 
   let mut file_name_vector: Vec<&str> = no_query_param[0].split("/").collect();

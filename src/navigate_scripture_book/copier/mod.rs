@@ -5,63 +5,64 @@ use std::path::Path;
 
 use scraper::{Html, Selector};
 
-use get_page::{get_page, ScrapedPage};
-use get_urls::urls_of_first_chapter;
-use gospellibraryscraper::{navigate, write_dir, write_section, UrlReference};
+use get_page::{get_page, ScrapedPage, OrderedScrapedPage};
+use get_urls::urls_of_chapter;
+use gospellibraryscraper::{navigate, write_dir, UrlReference};
 
-#[derive(Debug)]
-pub struct OrderedScrapedPage {
-  pub order_number: u8,
-  pub title: String,
-  pub scraped_page: ScrapedPage,
-}
-
-// fn parse_books_with_chapters(section_of_book: &Html, list_with_book: &Selector) {
-//   let mut order_number: u8 = 1;
-
-//   for element in section_of_book.select(&list_with_book) {
-//     let text = element.text().collect::<Vec<_>>()[0];
-//     println!("{:?}", text);
-//   }
+// #[derive(Debug)]
+// pub struct IndexPage {
+//   pub order_number: u16,
+//   pub title: String,
+//   pub contents: String,
 // }
 
-async fn parse_first_chapters(title_text: &str, section_of_book: &Html, active_link: &Selector) {
-  for element in section_of_book.select(&active_link) {
+async fn handle_write_file(urls_of_chapter: UrlReference, title_text: &str, order_number: u16) {
+  let page_data: ScrapedPage = get_page(&urls_of_chapter.original).await;
+
+  let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
+    order_number: order_number,
+    title: String::from(title_text),
+    scraped_page: page_data,
+  };
+
+  write_dir(&urls_of_chapter.dir);
+
+  if let Ok(d) = ordered_scraped_page.write_section(&urls_of_chapter.file) {
+    println!("{:?}", d);
+  };
+}
+
+async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Selector) {
+  let mut order_number: u16 = 1;
+
+  for element in html_to_parse.select(&selector_to_use) {
+    let title_text = element.text().collect::<Vec<_>>()[0];
+
     if let Some(url) = element.value().attr("href") {
-      let urls_of_first_chapter: UrlReference = urls_of_first_chapter(url);
-      let path_exist: bool = Path::new(&urls_of_first_chapter.file).exists();
+      let urls_of_chapter: UrlReference = urls_of_chapter(url);
+      let path_exist: bool = Path::new(&urls_of_chapter.file).exists();
 
       if path_exist {
-        println!("exists {}", &urls_of_first_chapter.file);
+        println!("exists {}", &urls_of_chapter.file);
       } else {
-        let page_data: ScrapedPage = get_page(&urls_of_first_chapter.original).await;
+        // INDEX PAGE WRITE.
+        // println!("DIR {}", urls_of_chapter.dir);
+        // println!("TITLE {}", book_title);
 
-        let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
-          order_number: 1,
-          title: String::from(title_text),
-          scraped_page: page_data,
-        };
-
-        write_dir(&urls_of_first_chapter.dir);
-
-        if let Ok(d) = write_section(
-          &urls_of_first_chapter.file,
-          &ordered_scraped_page.title,
-          &ordered_scraped_page.order_number,
-          &ordered_scraped_page.scraped_page.contents,
-          &ordered_scraped_page.scraped_page.summary,
-        ) {
-          println!("{:?}", d);
-        };
+        handle_write_file(urls_of_chapter, title_text, order_number).await;
       }
     }
+
+    order_number = order_number + 1;
   }
 }
 
-pub async fn copy(title_text: &str, url: &str) {
+//TODO: TITLE TEXT IS FOR INDEX.MD
+pub async fn copy(book_title: &str, url: &str) {
   let section_of_book: Html = navigate(url).await.unwrap();
   let active_link: Selector = Selector::parse("a.active-mDRbE").unwrap();
-  // let list_with_book: Selector = Selector::parse("ul.active-mDRbE a.item-3cCP7").unwrap();
-  parse_first_chapters(title_text, &section_of_book, &active_link).await;
-  // parse_books_with_chapters(&section_of_book, &list_with_book);
+  let list_with_book: Selector = Selector::parse("ul.active-mDRbE a.item-3cCP7").unwrap();
+
+  // handle_html_and_selector(&section_of_book, &active_link, book_title).await;
+  handle_html_and_selector(&section_of_book, &list_with_book).await;
 }
