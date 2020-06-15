@@ -7,13 +7,13 @@ async fn navigate_manifest(resp: &Html) {
   let contents_html: &Html = &resp;
   let contents_selector: Selector = Selector::parse(".manifest a").unwrap();
 
-  let mut index_count: u8 = 1;
+  let mut index_count: u16 = 1;
 
   for link in contents_html.select(&contents_selector) {
     let book_title: &str = link.text().collect::<Vec<_>>()[0];
 
     if let Some(url) = link.value().attr("href") {
-      copier::copy(book_title, url).await;
+      copier::copy(url, book_title, index_count).await;
       index_count = index_count + 1;
     }
   }

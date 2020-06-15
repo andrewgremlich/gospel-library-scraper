@@ -1,20 +1,11 @@
 mod get_page;
-mod get_urls;
 
 use std::path::Path;
 
 use scraper::{Html, Selector};
 
-use get_page::{get_page, ScrapedPage, OrderedScrapedPage};
-use get_urls::urls_of_chapter;
-use gospellibraryscraper::{navigate, write_dir, UrlReference};
-
-// #[derive(Debug)]
-// pub struct IndexPage {
-//   pub order_number: u16,
-//   pub title: String,
-//   pub contents: String,
-// }
+use get_page::{get_page, OrderedScrapedPage, ScrapedPage, IndexPage};
+use gospellibraryscraper::{navigate, write_dir, UrlReference, urls_of_chapter};
 
 async fn handle_write_file(urls_of_chapter: UrlReference, title_text: &str, order_number: u16) {
   let page_data: ScrapedPage = get_page(&urls_of_chapter.original).await;
@@ -32,7 +23,12 @@ async fn handle_write_file(urls_of_chapter: UrlReference, title_text: &str, orde
   };
 }
 
-async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Selector) {
+async fn handle_html_and_selector(
+  html_to_parse: &Html,
+  selector_to_use: &Selector,
+  book_title: &str,
+  index_count: u16,
+) {
   let mut order_number: u16 = 1;
 
   for element in html_to_parse.select(&selector_to_use) {
@@ -42,13 +38,22 @@ async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Select
       let urls_of_chapter: UrlReference = urls_of_chapter(url);
       let path_exist: bool = Path::new(&urls_of_chapter.file).exists();
 
+      
+      if book_title.len() > 0 {
+        // INDEX PAGE WRITE.
+          // let index_page: IndexPage = IndexPage {
+          //   index_number: index_count,
+            
+          // }
+
+        println!("DIR {}", urls_of_chapter.dir);
+        println!("TITLE {}", book_title);
+        println!("INDEX {}", index_count);
+      }
+
       if path_exist {
         println!("exists {}", &urls_of_chapter.file);
       } else {
-        // INDEX PAGE WRITE.
-        // println!("DIR {}", urls_of_chapter.dir);
-        // println!("TITLE {}", book_title);
-
         handle_write_file(urls_of_chapter, title_text, order_number).await;
       }
     }
@@ -58,11 +63,11 @@ async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Select
 }
 
 //TODO: TITLE TEXT IS FOR INDEX.MD
-pub async fn copy(book_title: &str, url: &str) {
+pub async fn copy(url: &str, book_title: &str, index_count: u16) {
   let section_of_book: Html = navigate(url).await.unwrap();
   let active_link: Selector = Selector::parse("a.active-mDRbE").unwrap();
   let list_with_book: Selector = Selector::parse("ul.active-mDRbE a.item-3cCP7").unwrap();
 
-  // handle_html_and_selector(&section_of_book, &active_link, book_title).await;
-  handle_html_and_selector(&section_of_book, &list_with_book).await;
+  handle_html_and_selector(&section_of_book, &active_link, book_title, index_count).await;
+  // handle_html_and_selector(&section_of_book, &list_with_book, "", index_count).await;
 }

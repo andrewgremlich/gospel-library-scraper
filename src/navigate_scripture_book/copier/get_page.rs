@@ -38,6 +38,12 @@ impl OrderedScrapedPage {
   }
 }
 
+#[derive(Debug)]
+pub struct IndexPage {
+  pub index_number: u16,
+  pub title: String,
+}
+
 pub async fn get_page(original_url: &str) -> ScrapedPage {
   let section_of_book: Html = navigate(original_url).await.unwrap();
 

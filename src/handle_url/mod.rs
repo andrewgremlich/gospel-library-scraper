@@ -1,4 +1,10 @@
-use gospellibraryscraper::UrlReference;
+#[derive(Debug)]
+pub struct UrlReference {
+  pub file: String,
+  pub dir: String,
+  pub original: String,
+  pub no_params: String,
+}
 
 pub fn urls_of_chapter(url: &str) -> UrlReference {
   let no_query_param: Vec<&str> = url.split("?").collect();
