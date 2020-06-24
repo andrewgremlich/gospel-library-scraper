@@ -4,11 +4,11 @@ use std::path::Path;
 
 use scraper::{Html, Selector};
 
-use get_page::{get_page, OrderedScrapedPage, ScrapedPage, IndexPage};
-use gospellibraryscraper::{navigate, write_dir, UrlReference, urls_of_chapter};
+use get_page::{get_page, IndexPage, OrderedScrapedPage, ScrapedPage};
+use gospellibraryscraper::{navigate, no_params, urls_of_chapter, write_dir, UrlReference};
 
 async fn handle_write_file(urls_of_chapter: UrlReference, title_text: &str, order_number: u16) {
-  let page_data: ScrapedPage = get_page(&urls_of_chapter.original).await;
+  let page_data: ScrapedPage = get_page(&urls_of_chapter.metadata.original).await;
 
   let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
     order_number: order_number,
@@ -38,14 +38,12 @@ async fn handle_html_and_selector(
       let urls_of_chapter: UrlReference = urls_of_chapter(url);
       let path_exist: bool = Path::new(&urls_of_chapter.file).exists();
 
-      
       if book_title.len() > 0 {
         // INDEX PAGE WRITE.
-          // let index_page: IndexPage = IndexPage {
-          //   index_number: index_count,
-            
-          // }
+        // let index_page: IndexPage = IndexPage {
+        //   index_number: index_count,
 
+        // }
         println!("DIR {}", urls_of_chapter.dir);
         println!("TITLE {}", book_title);
         println!("INDEX {}", index_count);
@@ -64,10 +62,14 @@ async fn handle_html_and_selector(
 
 //TODO: TITLE TEXT IS FOR INDEX.MD
 pub async fn copy(url: &str, book_title: &str, index_count: u16) {
+  let mut file_name_vector: Vec<&str> = no_params(url).split("/").collect();
+
+  println!("{:?}{:?}{:?}", file_name_vector, book_title, index_count);
+
   let section_of_book: Html = navigate(url).await.unwrap();
   let active_link: Selector = Selector::parse("a.active-mDRbE").unwrap();
   let list_with_book: Selector = Selector::parse("ul.active-mDRbE a.item-3cCP7").unwrap();
 
-  handle_html_and_selector(&section_of_book, &active_link, book_title, index_count).await;
+  // handle_html_and_selector(&section_of_book, &active_link, book_title, index_count).await;
   // handle_html_and_selector(&section_of_book, &list_with_book, "", index_count).await;
 }
