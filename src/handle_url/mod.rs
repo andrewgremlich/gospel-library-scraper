@@ -11,7 +11,7 @@ pub struct UrlReference {
   pub metadata: UrlMetaData,
 }
 
-fn remove_file_name(url: &str) -> String {
+pub fn remove_file_name(url: &str) -> String {
   let mut file_name_vector: Vec<&str> = url.split("/").collect();
 
   file_name_vector.pop();
