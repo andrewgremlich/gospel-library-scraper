@@ -14,6 +14,18 @@ Currently only scrapes `/study/scriptures?lang=eng`.
 
 Will output Markdown files to a `study/` folder in the present working directory.
 
+## upgrade ideas
+
+1. Provide command line option to parse into hugo compatible files.
+
+2. Provide a command line option to get a language.
+
+    - provide language codes.
+
+3. Provide command line argument to go for verses.
+
+    - provide grab foot notes as well.
+
 ## reference
 
 - [Web scraping in rust](https://codeburst.io/web-scraping-in-rust-881b534a60f7)
