@@ -37,3 +37,4 @@ Will output Markdown files to a `study/` folder in the present working directory
 - [reqwest](https://docs.rs/reqwest/0.10.4/reqwest/index.html)
 - [mkdirp](https://docs.rs/mkdirp/1.0.0/mkdirp/)
 - [regex](https://docs.rs/regex/1.3.9/regex/)
+- [Clap](https://github.com/clap-rs/clap)
