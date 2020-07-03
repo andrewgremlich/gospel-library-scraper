@@ -1,6 +1,8 @@
 mod copier;
+mod make_book_index_file;
 
-use copier::{copy_book, make_book_index_file};
+use make_book_index_file::write_index;
+use copier::copy_book;
 use gospellibraryscraper::navigate;
 use scraper::{Html, Selector};
 
@@ -14,7 +16,7 @@ async fn navigate_manifest(manifest: &Html) {
         let book_title: &str = book_of_scripture_link.text().collect::<Vec<_>>()[0];
 
         if let Some(href) = book_of_scripture_link.value().attr("href") {
-            make_book_index_file(href, book_title, index_count);
+            write_index(href, book_title, index_count);
             copy_book(href).await;
             index_count = index_count + 1;
         }

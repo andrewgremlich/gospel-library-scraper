@@ -2,7 +2,6 @@ mod text_transform;
 
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::Path;
 
 use gospellibraryscraper::navigate;
 use scraper::{Html, Selector};
@@ -22,7 +21,7 @@ pub struct OrderedScrapedPage {
 }
 
 impl OrderedScrapedPage {
-    pub fn write_section(&self, file_name: &str) -> std::io::Result<String> {
+    pub fn write_with_hugo_header(&self, file_name: &str) -> std::io::Result<String> {
         let mut file = File::create(file_name)?;
         file.write(b"---\n")?;
         file.write(format!("title: {}\n", &self.title).as_bytes())?;
@@ -32,32 +31,11 @@ impl OrderedScrapedPage {
         file.write_all(&self.scraped_page.contents.as_bytes())?;
         return Ok(format!("wrote {}", file_name));
     }
-}
 
-#[derive(Debug)]
-pub struct IndexPage {
-    pub index_number: u16,
-    pub title: String,
-    pub url: String,
-}
-
-impl IndexPage {
-    pub fn write_index_file(&self) -> std::io::Result<String> {
-        let path_exist: bool = Path::new(&self.url).exists();
-
-        if path_exist {
-            return Ok(format!("already exists {}", &self.title));
-        } else {
-            let mut file = File::create(&self.url)?;
-
-            file.write(b"---\n")?;
-            file.write(format!("title: {}\n", &self.title).as_bytes())?;
-            file.write(format!("order: {}\n", &self.index_number).as_bytes())?;
-            file.write(b"---\n")?;
-            file.write_all(b"Index page.\n")?;
-
-            return Ok(format!("wrote {}", &self.url));
-        }
+    pub fn write_md_section(&self, file_name: &str) -> std::io::Result<String> {
+        let mut file = File::create(file_name)?;
+        file.write_all(&self.scraped_page.contents.as_bytes())?;
+        return Ok(format!("wrote {}", file_name));
     }
 }
 
