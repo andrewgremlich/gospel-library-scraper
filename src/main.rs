@@ -1,19 +1,29 @@
 mod navigate_scriptures;
+mod setup;
 
-use clap::{App, load_yaml};
-
-use gospellibraryscraper::navigate;
 use scraper::Html;
+use std::env;
+
+use clap::{load_yaml, App, ArgMatches};
+use gospellibraryscraper::navigate;
+use navigate_scriptures::get_scripture_books_url;
 
 #[tokio::main]
 async fn main() {
-    // The YAML file is found relative to the current file, similar to how modules are found
     let yaml = load_yaml!("cli.yml");
-    let matches = App::from(yaml).get_matches();
+    let matches: ArgMatches = App::from(yaml).get_matches();
 
-    println!("{:?}", matches)
+    setup::env(&matches);
 
-    // let scriptures_page_html_data: Html = navigate("/study/scriptures?lang=eng").await.unwrap();
+    if let Some(l) = matches.value_of("lang") {
+        let url: String = format!("/study/scriptures?lang={}", l);
 
-    // navigate_scriptures::get_scripture_books_url(&scriptures_page_html_data).await;
+        println!("{:?}", url);
+        println!("{:?}", env::var("GO_HUGO"));
+        println!("{:?}", env::var("FOOTNOTES"));
+        println!("{:?}", env::var("VERSES"));
+
+        let scriptures_page_html_data: Html = navigate(&url).await.unwrap();
+        get_scripture_books_url(&scriptures_page_html_data).await;
+    }
 }

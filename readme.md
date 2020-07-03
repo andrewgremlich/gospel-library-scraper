@@ -14,17 +14,9 @@ Currently only scrapes `/study/scriptures?lang=eng`.
 
 Will output Markdown files to a `study/` folder in the present working directory.
 
-## upgrade ideas
+## upgrade
 
-1. Provide command line option to parse into hugo compatible files.
-
-2. Provide a command line option to get a language.
-
-    - provide language codes.
-
-3. Provide command line argument to go for verses.
-
-    - provide grab foot notes as well.
+1. Implement "GO_HUGO", "FOOTNOTES", and "VERSES" environment vars.
 
 ## reference
 

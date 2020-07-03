@@ -1,28 +1,25 @@
-name: gospellibraryscraper
+name: Gospel Library Scraper
 version: "0.2.0"
-author: Andrew Gremlich
-about: Web scrape for the scriptures.
+author: "Andrew Gremlich"
+about: "Scrape the Gospel Library."
 args:
-    - config:
-        short: c
-        long: config
-        value_name: FILE
-        about: Sets a custom config file
+    - lang:
+        short: l
+        long: lang
+        value_name: LANG
+        help: Scrape in a specific language.
         takes_value: true
-    - INPUT:
-        about: Sets the input file to use
         required: true
-        index: 1
-    - verbose:
-        short: v
+    - go-hugo:
+        short: g
+        long: go-hugo
         multiple: true
-        about: Sets the level of verbosity
+        help: 'Write to Hugo compatible files.'
+        takes_value: false
 subcommands:
-    - test:
-        about: controls testing features
-        version: "1.3"
-        author: Someone E. <someone_else@other.com>
+    - verses:
+        about: "Fetched data gets written in verses"
         args:
-            - debug:
-                short: d
-                about: print debug information
+            - footnotes:
+                short: f
+                help: Write verses with footnotes attached.
