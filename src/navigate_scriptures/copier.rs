@@ -1,37 +1,11 @@
-mod get_page;
+mod scraped_page;
 
 use std::path::Path;
 
 use scraper::{Html, Selector};
 
-use get_page::{get_page, OrderedScrapedPage, ScrapedPage};
-use gospellibraryscraper::{
-    get_env_var, navigate, urls_of_chapter, write_dir, UrlReference,
-};
-
-async fn handle_write_file(urls_of_chapter: UrlReference, title_text: &str, order_number: u16) {
-    let page_data: ScrapedPage = get_page(&urls_of_chapter.metadata.original).await;
-
-    let ordered_scraped_page: OrderedScrapedPage = OrderedScrapedPage {
-        order_number: order_number,
-        title: String::from(title_text),
-        scraped_page: page_data,
-    };
-
-    let output_format: String = get_env_var("OUTPUT_FORMAT");
-
-    write_dir(&urls_of_chapter.dir);
-
-    if output_format == "hugo" {
-        if let Ok(d) = ordered_scraped_page.write_with_hugo_header(&urls_of_chapter.file) {
-            println!("{:?}", d);
-        };
-    } else if output_format == "md" {
-        if let Ok(d) = ordered_scraped_page.write_md_section(&urls_of_chapter.file) {
-            println!("{:?}", d);
-        };
-    }
-}
+use gospellibraryscraper::{navigate, urls_of_chapter, UrlReference};
+use scraped_page::ScrapedPage;
 
 async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Selector) {
     let mut order_number: u16 = 1;
@@ -47,7 +21,10 @@ async fn handle_html_and_selector(html_to_parse: &Html, selector_to_use: &Select
             if path_exist {
                 println!("exists {}", &urls_of_chapter.file);
             } else {
-                handle_write_file(urls_of_chapter, title_text, order_number).await;
+                let scraped_page =
+                    ScrapedPage::new(urls_of_chapter, title_text, order_number).await;
+
+                scraped_page.write_handler();
             }
         }
 

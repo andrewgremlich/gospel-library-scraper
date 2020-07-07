@@ -1,10 +1,8 @@
 use clap::ArgMatches;
 
 use std::env;
-use std::str::FromStr;
 
 pub fn set_env(matches: &ArgMatches) {
-
     if let Some(f) = matches.value_of("format") {
         println!("{:?}", f);
         env::set_var("OUTPUT_FORMAT", f);
@@ -22,8 +20,12 @@ pub fn set_env(matches: &ArgMatches) {
 }
 
 pub fn get_env_var(var_name: &str) -> String {
-    let env_value: String = env::var(var_name).unwrap();
-    // maybe do something to parse numbers if number or bool if bool.
-    // let hugo_files_bool: bool = FromStr::from_str(&write_hugo_files).unwrap();
-    return env_value;
+    match env::var(var_name) {
+        Ok(d) => {
+            return d;
+        }
+        Err(_) => {
+            return format!("Env var not set for {}", var_name);
+        }
+    }
 }
