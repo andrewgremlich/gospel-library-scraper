@@ -2,14 +2,29 @@ mod navigate_scriptures;
 
 use scraper::Html;
 
-use clap::{load_yaml, App, ArgMatches};
+use clap::{Arg, ArgMatches, Command};
+
 use gospellibraryscraper::{navigate, set_env};
 use navigate_scriptures::get_scripture_books_url;
 
 #[tokio::main]
 async fn main() {
-    let yaml = load_yaml!("cli.yml");
-    let matches: ArgMatches = App::from(yaml).get_matches();
+    let matches: ArgMatches = Command::new("Gospel Library Scraper")
+        .arg(
+            Arg::new("output")
+                .short('o')
+                .long("output")
+                .help("What file extension should this go to.")
+                .default_value("txt"),
+        )
+        .arg(
+            Arg::new("lang")
+                .short('l')
+                .long("lang")
+                .help("Which gospel library language to scrape.")
+                .default_value("eng"),
+        )
+        .get_matches();
 
     set_env(&matches);
 
